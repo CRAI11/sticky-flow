@@ -1,45 +1,82 @@
-const notes = [
-  {
+// const notesData = [
+//   {
+//     id: 1,
+//     title: "This is first note",
+//     created_on: "13/01/2026",
+//     content:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
+//   },
+//   {
+//     id: 2,
+//     title: "This is second note",
+//     created_on: "13/01/2026",
+//     content:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
+//   },
+//   {
+//     id: 3,
+//     title: "This is third note",
+//     created_on: "13/01/2026",
+//     content:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
+//   },
+//   {
+//     id: 4,
+//     title: "This is forth note",
+//     created_on: "13/01/2026",
+//     content:
+//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
+//   },
+//   {
+//     id: 5,
+//     title: "This is first note with very long content",
+//     created_on: "13/01/2026",
+//     content:
+//       "This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
+//   },
+// ];
+const notesData = {
+  1: {
     id: 1,
     title: "This is first note",
     created_on: "13/01/2026",
     content:
       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
   },
-  {
+  2: {
     id: 2,
     title: "This is second note",
     created_on: "13/01/2026",
     content:
       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
   },
-  {
+  3: {
     id: 3,
     title: "This is third note",
     created_on: "13/01/2026",
     content:
       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
   },
-  {
+  4: {
     id: 4,
     title: "This is forth note",
     created_on: "13/01/2026",
     content:
       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
   },
-  {
+  5: {
     id: 5,
     title: "This is first note with very long content",
     created_on: "13/01/2026",
     content:
       "This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
   },
-];
+};
 
 import "./SimpleNoteLayout.css";
 import NoteCard from "../../components/NoteCard/NoteCard";
 import useModal from "../../hooks/useModal";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Modal from "../../components/Modals/Modal";
 
@@ -60,7 +97,19 @@ const itemVariants = {
 
 export default function SimpleNoteLayout() {
   const { isOpen, open, close } = useModal();
-  const [selectedNote, setSelectedNote] = useState(null);
+  const [notes, setNotes] = useState(notesData || {})
+  const [activeNote, setActiveNote] = useState(null);
+
+  const handleSave = useCallback((updatedNote) => {
+    if(!activeNote) return
+    console.log({ updatedNote, activeNote })
+    setNotes((prevState) => ({...prevState, [activeNote.id]: {...updatedNote}}))
+  }, [activeNote])
+
+  const handleClose = () => {
+    close();
+    setActiveNote(null)
+  }
 
   return (
     <>
@@ -70,28 +119,29 @@ export default function SimpleNoteLayout() {
         initial="hidden"
         animate="visible"
       >
-        {notes.map((note) => (
+        {Object.keys(notes).map((noteId) => (
           <motion.div
-            key={note.id}
+            key={noteId}
             variants={itemVariants}
             animate={{
-              opacity: isOpen && selectedNote?.id === note.id ? 0 : 1,
+              opacity: isOpen && activeNote?.id === noteId ? 0 : 1,
               transition: { duration: 0.3 },
             }}
           >
             <NoteCard
-              key={note.id}
-              note={note}
-              actions={{ setSelectedNote, open }}
+              key={noteId}
+              info={{ note: notes[noteId] }}
+              actions={{ setActiveNote, open }}
             />
           </motion.div>
         ))}
       </motion.div>
 
       <Modal
-        data={selectedNote}
+        data={activeNote}
         isOpen={isOpen}
-        onClose={close}
+        onClose={handleClose}
+        actions={{ handleSave }}
         children={<Modal.NoteDetail />}
       />
     </>

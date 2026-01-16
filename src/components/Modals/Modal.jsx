@@ -21,9 +21,10 @@ const modalVariants = {
   },
 };
 
-const Modal = ({ data, isOpen, onClose, children }) => {
+const Modal = ({ data, actions, isOpen, onClose, children }) => {
+  
   return (
-    <ModalContext.Provider value={{ data }}>
+    <ModalContext.Provider value={{ data, actions }}>
       <AnimatePresence>
         {isOpen && (
           <motion.div

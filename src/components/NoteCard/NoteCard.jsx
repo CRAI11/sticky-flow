@@ -1,7 +1,8 @@
-export default function NoteCard({ note, actions }) {
+export default function NoteCard({ info, actions }) {
+  const { note } = info
   const handleClick = () => {
-    actions.setSelectedNote(note);
     actions.open();
+    actions.setActiveNote(note);
   };
 
   return (
