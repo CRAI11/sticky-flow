@@ -11,10 +11,6 @@
 
 .modal-content {
   background: #fff;
-  width: min(400px, 90vw);
-  max-height: 80vh;
-
-  padding: 1.5rem;
   border-radius: 12px;
 
   overflow-y: auto;

@@ -1,43 +1,36 @@
 .note-detail-form {
     display: flex;
     flex-direction: column;
+    width: min(500px, 100vw);
+    padding: 1.5rem;
 }
 
-/* Base styles for both input and textarea */
 .note-title-input,
 .note-content-textarea {
     width: 100%;
     border: none;
     background-color: transparent;
     padding: 8px;
-    /* Add some padding for better clickability */
     margin: 0;
     font-family: var(--font-family-sans);
     color: var(--color-text-primary);
-
-    /* Remove the default focus outline */
     outline: none;
 }
 
-/* Style for the title input */
 .note-title-input {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-medium);
     line-height: var(--line-height-heading);
 }
 
-/* Style for the content textarea */
 .note-content-textarea {
     font-size: var(--font-size-base);
     line-height: var(--line-height-body);
-
-    /* This is crucial for the auto-sizing to work */
     resize: none;
-    overflow: hidden;
-    /* Hide the scrollbar */
+    overflow: auto;
+    height: 100%;
 }
 
-/* Add a subtle underline on focus to show it's editable */
 .note-title-input:focus,
 .note-content-textarea:focus {
     box-shadow: 0 1px 0 0 var(--color-border);

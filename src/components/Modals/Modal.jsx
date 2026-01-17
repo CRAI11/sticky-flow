@@ -41,6 +41,7 @@ const Modal = ({ data, actions, isOpen, onClose, children }) => {
               initial="hidden"
               animate="visible"
               exit="hidden"
+              onClick={(e) => e.stopPropagation()}
             >
               {children}
             </motion.div>

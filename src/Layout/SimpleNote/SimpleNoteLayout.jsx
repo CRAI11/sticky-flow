@@ -69,7 +69,7 @@ const notesData = {
     title: "This is first note with very long content",
     created_on: "13/01/2026",
     content:
-      "This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
+      "This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
   },
 };
 
@@ -119,18 +119,17 @@ export default function SimpleNoteLayout() {
         initial="hidden"
         animate="visible"
       >
-        {Object.keys(notes).map((noteId) => (
+        {Object.values(notes).map((note) => (
           <motion.div
-            key={noteId}
+            key={note.id}
             variants={itemVariants}
             animate={{
-              opacity: isOpen && activeNote?.id === noteId ? 0 : 1,
+              opacity: isOpen && activeNote?.id === note.id ? 0 : 1,
               transition: { duration: 0.3 },
             }}
           >
             <NoteCard
-              key={noteId}
-              info={{ note: notes[noteId] }}
+              info={{ note }}
               actions={{ setActiveNote, open }}
             />
           </motion.div>

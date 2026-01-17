@@ -35,7 +35,7 @@ export default function NoteDetail() {
   };
 
   return (
-    <div className="note-detail-form" onClick={(e) => e.stopPropagation()}>
+    <div className="note-detail-form">
       <input
         type="text"
         name="title"
@@ -50,7 +50,7 @@ export default function NoteDetail() {
         value={draft.content}
         onChange={handleTextareaChange}
         placeholder="Take a note..."
-        rows={10}
+        rows={20}
       />
     </div>
   );
