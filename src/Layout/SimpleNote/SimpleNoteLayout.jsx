@@ -1,84 +1,10 @@
-// const notesData = [
-//   {
-//     id: 1,
-//     title: "This is first note",
-//     created_on: "13/01/2026",
-//     content:
-//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-//   },
-//   {
-//     id: 2,
-//     title: "This is second note",
-//     created_on: "13/01/2026",
-//     content:
-//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-//   },
-//   {
-//     id: 3,
-//     title: "This is third note",
-//     created_on: "13/01/2026",
-//     content:
-//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-//   },
-//   {
-//     id: 4,
-//     title: "This is forth note",
-//     created_on: "13/01/2026",
-//     content:
-//       "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-//   },
-//   {
-//     id: 5,
-//     title: "This is first note with very long content",
-//     created_on: "13/01/2026",
-//     content:
-//       "This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-//   },
-// ];
-const notesData = {
-  1: {
-    id: 1,
-    title: "This is first note",
-    created_on: "13/01/2026",
-    content:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-  },
-  2: {
-    id: 2,
-    title: "This is second note",
-    created_on: "13/01/2026",
-    content:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-  },
-  3: {
-    id: 3,
-    title: "This is third note",
-    created_on: "13/01/2026",
-    content:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-  },
-  4: {
-    id: 4,
-    title: "This is forth note",
-    created_on: "13/01/2026",
-    content:
-      "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-  },
-  5: {
-    id: 5,
-    title: "This is first note with very long content",
-    created_on: "13/01/2026",
-    content:
-      "This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? This is a longer note to test the scrolling functionality of the modal. Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate? Lorem ipsum dolor sit, amet consectetur adipisicing elit. Saepe aliquam tempore iure eos facere iusto harum. Ab libero ipsum voluptate?",
-  },
-};
-
 import "./SimpleNoteLayout.css";
 import NoteCard from "../../components/NoteCard/NoteCard";
 import useModal from "../../hooks/useModal";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Modal from "../../components/Modals/Modal";
+import { getNotes } from "../../services/noteService";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -97,19 +23,53 @@ const itemVariants = {
 
 export default function SimpleNoteLayout() {
   const { isOpen, open, close } = useModal();
-  const [notes, setNotes] = useState(notesData || {})
+  const [notes, setNotes] = useState({});
   const [activeNote, setActiveNote] = useState(null);
 
-  const handleSave = useCallback((updatedNote) => {
-    if(!activeNote) return
-    console.log({ updatedNote, activeNote })
-    setNotes((prevState) => ({...prevState, [activeNote.id]: {...updatedNote}}))
-  }, [activeNote])
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchNotes = async () => {
+      try {
+        const response = await getNotes(controller.signal);
+        const notesObject = Object.values(response)?.reduce((acc, note) => {
+          acc[note.id] = note;
+          return acc;
+        }, {});
+        // console.log(Object.entries(response))
+        // const notesObject = Object.fromEntries(
+        //   notesData.map((note) => [note.id, note]),
+        // );
+        setNotes(notesObject);
+      } catch (err) {
+        if (err.name !== "CanceledError") {
+          console.error(err);
+        }
+      }
+    };
+
+    fetchNotes();
+
+    return () => {
+      controller.abort("Component unmounting");
+    };
+  }, []);
+
+  const handleSave = useCallback(
+    (updatedNote) => {
+      if (!activeNote) return;
+      console.log({ updatedNote, activeNote });
+      setNotes((prevState) => ({
+        ...prevState,
+        [activeNote.id]: { ...updatedNote },
+      }));
+    },
+    [activeNote],
+  );
 
   const handleClose = () => {
     close();
-    setActiveNote(null)
-  }
+    setActiveNote(null);
+  };
 
   return (
     <>
@@ -128,10 +88,7 @@ export default function SimpleNoteLayout() {
               transition: { duration: 0.3 },
             }}
           >
-            <NoteCard
-              info={{ note }}
-              actions={{ setActiveNote, open }}
-            />
+            <NoteCard info={{ note }} actions={{ setActiveNote, open }} />
           </motion.div>
         ))}
       </motion.div>
