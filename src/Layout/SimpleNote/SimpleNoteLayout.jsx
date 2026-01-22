@@ -1,10 +1,10 @@
 import "./SimpleNoteLayout.css";
 import NoteCard from "../../components/NoteCard/NoteCard";
 import useModal from "../../hooks/useModal";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import Modal from "../../components/Modals/Modal";
-import { getNotes } from "../../services/noteService";
+import { useNotes } from "../../context/NoteContext";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -23,48 +23,19 @@ const itemVariants = {
 
 export default function SimpleNoteLayout() {
   const { isOpen, open, close } = useModal();
-  const [notes, setNotes] = useState({});
-  const [activeNote, setActiveNote] = useState(null);
+
+  const { notes, getNotes, activeNote, setActiveNote } = useNotes();
 
   useEffect(() => {
     const controller = new AbortController();
-    const fetchNotes = async () => {
-      try {
-        const response = await getNotes(controller.signal);
-        const notesObject = Object.values(response)?.reduce((acc, note) => {
-          acc[note.id] = note;
-          return acc;
-        }, {});
-        // console.log(Object.entries(response))
-        // const notesObject = Object.fromEntries(
-        //   notesData.map((note) => [note.id, note]),
-        // );
-        setNotes(notesObject);
-      } catch (err) {
-        if (err.name !== "CanceledError") {
-          console.error(err);
-        }
-      }
-    };
-
-    fetchNotes();
+    (async () => {
+      await getNotes(controller.signal);
+    })();
 
     return () => {
       controller.abort("Component unmounting");
     };
   }, []);
-
-  const handleSave = useCallback(
-    (updatedNote) => {
-      if (!activeNote) return;
-      console.log({ updatedNote, activeNote });
-      setNotes((prevState) => ({
-        ...prevState,
-        [activeNote.id]: { ...updatedNote },
-      }));
-    },
-    [activeNote],
-  );
 
   const handleClose = () => {
     close();
@@ -94,10 +65,8 @@ export default function SimpleNoteLayout() {
       </motion.div>
 
       <Modal
-        data={activeNote}
         isOpen={isOpen}
         onClose={handleClose}
-        actions={{ handleSave }}
         children={<Modal.NoteDetail />}
       />
     </>

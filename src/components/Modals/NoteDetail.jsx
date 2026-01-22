@@ -1,6 +1,7 @@
 import "./NoteDetail.css";
 import { useModalContext } from "../../context/ModalContext";
 import { useEffect, useRef, useState } from "react";
+import { useNotes } from "../../context/NoteContext";
 
 const defaultDraft = {
   title: "",
@@ -8,8 +9,8 @@ const defaultDraft = {
 };
 
 export default function NoteDetail() {
-  const { data, actions } = useModalContext();
-  const [draft, setDraft] = useState(data || defaultDraft);
+  const { activeNote, updateNotes } = useNotes();
+  const [draft, setDraft] = useState(activeNote || defaultDraft);
 
   const draftRef = useRef(draft);
   useEffect(() => {
@@ -18,10 +19,9 @@ export default function NoteDetail() {
 
   useEffect(() => {
     return () => {
-      console.log("Save effect rendered")
-      actions.handleSave(draftRef.current);
+      updateNotes(draftRef.current);
     };
-  }, [actions.handleSave]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -1,5 +1,4 @@
 import "./Modal.css";
-import ModalContext from "../../context/ModalContext";
 import NoteDetail from "./NoteDetail";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -21,34 +20,31 @@ const modalVariants = {
   },
 };
 
-const Modal = ({ data, actions, isOpen, onClose, children }) => {
-  
+const Modal = ({ isOpen, onClose, children }) => {
   return (
-    <ModalContext.Provider value={{ data, actions }}>
-      <AnimatePresence>
-        {isOpen && (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="modal-backdrop"
+          onClick={onClose}
+          variants={backdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit={"hidden"}
+        >
           <motion.div
-            className="modal-backdrop"
-            onClick={onClose}
-            variants={backdropVariants}
+            className="modal-content"
+            variants={modalVariants}
             initial="hidden"
             animate="visible"
-            exit={"hidden"}
+            exit="hidden"
+            onClick={(e) => e.stopPropagation()}
           >
-            <motion.div
-              className="modal-content"
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {children}
-            </motion.div>
+            {children}
           </motion.div>
-        )}
-      </AnimatePresence>
-    </ModalContext.Provider>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
