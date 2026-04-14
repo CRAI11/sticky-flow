@@ -2,12 +2,7 @@ import "./UI.css";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiPlus, FiEdit, FiType } from "react-icons/fi";
-import { ICON_SIZES } from "../../constants";
-
-const subItems = [
-  { id: "draw", icon: <FiEdit size={ICON_SIZES.SMALL} />, label: "Drawing" },
-  { id: "text", icon: <FiType size={ICON_SIZES.SMALL} />, label: "Text" },
-];
+import { FLOATING_BTN_ACTION, ICON_SIZES } from "../../constants";
 
 const containerVariants = {
   open: {
@@ -40,8 +35,33 @@ const itemVariants = {
   },
 };
 
-export default function FloatingActionButton() {
+export default function FloatingActionButton({ onCreateNote }) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleCreateTextNote = async () => {
+    const tempNote = {
+      id: "new",
+      title: "",
+      content: "",
+    };
+
+    onCreateNote(tempNote)
+  };
+
+  const subItems = [
+    {
+      id: FLOATING_BTN_ACTION.DRAW,
+      icon: <FiEdit size={ICON_SIZES.SMALL} />,
+      label: "Drawing",
+      action: () => console.log("drawing"),
+    },
+    {
+      id: FLOATING_BTN_ACTION.SIMPLE,
+      icon: <FiType size={ICON_SIZES.SMALL} />,
+      label: "Text",
+      action: handleCreateTextNote,
+    },
+  ];
 
   return (
     <div className="fab-container">
@@ -56,7 +76,7 @@ export default function FloatingActionButton() {
           >
             {subItems.map((item) => (
               <motion.li key={item.id} variants={itemVariants}>
-                <button className="fab-option-button">
+                <button className="fab-option-button" onClick={item.action}>
                   <span>{item.icon}</span>
                   <span>{item.label}</span>
                 </button>

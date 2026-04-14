@@ -1,6 +1,6 @@
 import "./Modal.css";
 import NoteDetail from "./NoteDetail";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 
 const backdropVariants = {
   visible: { opacity: 1 },
@@ -20,31 +20,27 @@ const modalVariants = {
   },
 };
 
-const Modal = ({ isOpen, onClose, children }) => {
+const Modal = ({ onClose, children }) => {
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          className="modal-backdrop"
-          onClick={onClose}
-          variants={backdropVariants}
-          initial="hidden"
-          animate="visible"
-          exit={"hidden"}
-        >
-          <motion.div
-            className="modal-content"
-            variants={modalVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {children}
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <motion.div
+      className="modal-backdrop"
+      onClick={onClose}
+      variants={backdropVariants}
+      initial="hidden"
+      animate="visible"
+      exit={"hidden"}
+    >
+      <motion.div
+        className="modal-content"
+        variants={modalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
   );
 };
 

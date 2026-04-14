@@ -1,15 +1,16 @@
 import { useState } from "react";
+import { LOADING_ENUMS } from "../constants";
 
 export default function useLoader() {
-  const [currentStatus, setCurrentStatus] = useState("idle");
+  const [loadingStatus, setLoadingStatus] = useState(LOADING_ENUMS.IDLE);
 
-  const updateStatus = (status) => {
-    if (status === currentStatus) return;
-    setCurrentStatus(status);
+  const setLoader = (status) => {
+    if (status === loadingStatus) return;
+    setLoadingStatus(status);
   };
 
   return {
-    currentStatus,
-    updateStatus,
+    loadingStatus,
+    setLoader,
   };
 }

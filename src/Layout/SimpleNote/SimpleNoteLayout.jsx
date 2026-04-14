@@ -2,9 +2,10 @@ import "./SimpleNoteLayout.css";
 import NoteCard from "../../components/NoteCard/NoteCard";
 import useModal from "../../hooks/useModal";
 import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import Modal from "../../components/Modals/Modal";
 import { useNotes } from "../../context/NoteContext";
+import FloatingActionButton from "../../components/UI/FloatingActionButton";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -22,23 +23,16 @@ const itemVariants = {
 };
 
 export default function SimpleNoteLayout() {
-  const { isOpen, open, close } = useModal();
-
   const { notes, getNotes, activeNote, setActiveNote } = useNotes();
 
   useEffect(() => {
     const controller = new AbortController();
-    (async () => {
-      await getNotes(controller.signal);
-    })();
+    getNotes(controller.signal);
 
-    return () => {
-      controller.abort("Component unmounting");
-    };
+    return () => controller.abort("Component unmounting");
   }, []);
 
   const handleClose = () => {
-    close();
     setActiveNote(null);
   };
 
@@ -55,20 +49,22 @@ export default function SimpleNoteLayout() {
             key={note.id}
             variants={itemVariants}
             animate={{
-              opacity: isOpen && activeNote?.id === note.id ? 0 : 1,
+              opacity: activeNote && activeNote?.id === note.id ? 0 : 1,
               transition: { duration: 0.3 },
             }}
           >
-            <NoteCard info={{ note }} actions={{ setActiveNote, open }} />
+            <NoteCard note={note} onClick={() => setActiveNote(note)} />
           </motion.div>
         ))}
       </motion.div>
 
-      <Modal
-        isOpen={isOpen}
-        onClose={handleClose}
-        children={<Modal.NoteDetail />}
-      />
+      <FloatingActionButton onCreateNote={(note) => setActiveNote(note)} />
+
+      <AnimatePresence>
+        {activeNote && (
+          <Modal onClose={handleClose} children={<Modal.NoteDetail />} />
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,5 +1,4 @@
 import "./NoteDetail.css";
-import { useModalContext } from "../../context/ModalContext";
 import { useEffect, useRef, useState } from "react";
 import { useNotes } from "../../context/NoteContext";
 
@@ -9,7 +8,7 @@ const defaultDraft = {
 };
 
 export default function NoteDetail() {
-  const { activeNote, updateNotes } = useNotes();
+  const { activeNote, updateNotes, createNotes } = useNotes();
   const [draft, setDraft] = useState(activeNote || defaultDraft);
 
   const draftRef = useRef(draft);
@@ -19,7 +18,18 @@ export default function NoteDetail() {
 
   useEffect(() => {
     return () => {
-      updateNotes(draftRef.current);
+      const finalDraft = draftRef.current;
+
+      if (!finalDraft.title && !finalDraft.content) {
+        console.log("Empty note, not saving.");
+        return;
+      }
+
+      if (finalDraft.id === "new") {
+        createNotes(finalDraft);
+      } else {
+        updateNotes(finalDraft);
+      }
     };
   }, []);
 
